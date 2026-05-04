@@ -1,0 +1,487 @@
+# NBA-2026
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 NBA PLAYOFFS | 巔峰決戰全解析</title>
+    <!-- Google Fonts: 運動感極強的 Bebas Neue 與 Noto Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+TC:wght@300;400;700;900&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #020617; /* 極深暗藍 */
+            --bg-card: rgba(15, 23, 42, 0.8);
+            --accent-gold: #FFD700; /* 亮黃金 */
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --danger: #ef4444;
+            --glass-border: rgba(255, 215, 0, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+            color: var(--text-main);
+            font-family: 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        /* --- Hero Section --- */
+        header {
+            text-align: center;
+            padding: 80px 0 60px;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: clamp(60px, 12vw, 120px);
+            line-height: 0.8;
+            color: var(--accent-gold);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            color: var(--text-main);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* --- Navigation --- */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            padding: 12px 30px;
+            font-family: 'Oswald', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--accent-gold);
+            color: var(--bg-deep);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* --- Matchup Grid --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+            display: none; /* 初期隱藏 */
+        }
+
+        .grid.active { display: grid; animation: fadeInUp 0.6s ease forwards; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent-gold);
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+            border-color: var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .vs-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .team-info img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+
+        .team-name {
+            font-weight: 900;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .vs-circle {
+            background: rgba(255, 215, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue';
+            color: var(--accent-gold);
+            border: 1px solid var(--glass-border);
+        }
+
+        .win-prob-bar {
+            margin-top: 25px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .win-prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold));
+            width: 0; /* JS控制 */
+            transition: width 1.5s ease-in-out;
+        }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.95);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: #0f172a;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            overflow-y: auto;
+            position: relative;
+            padding: 40px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: var(--accent-gold);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .player-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .player-card:hover { background: rgba(255,215,0,0.05); }
+
+        .player-img {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #1e293b;
+            margin-bottom: 10px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .player-card:hover .player-img { border-color: var(--accent-gold); }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 響應式 */
+        @media (max-width: 600px) {
+            .hero-title { font-size: 50px; }
+            .nav-tabs { gap: 8px; }
+            .tab-btn { padding: 10px 15px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <p class="hero-subtitle">NBA POSTSEASON ANALYSIS</p>
+        <h1 class="hero-title">2026 PLAYOFFS</h1>
+        <p style="color: var(--accent-gold); letter-spacing: 2px;">八強決戰 · 官方數據即時解析</p>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="showTab('east')">Eastern Conf.</button>
+        <button class="tab-btn" onclick="showTab('west')">Western Conf.</button>
+        <button class="tab-btn" onclick="showTab('expert')">專家解析</button>
+    </nav>
+
+    <!-- 東區 -->
+    <div id="east" class="grid active">
+        <!-- Knicks vs 76ers -->
+        <div class="card" onclick="openModal('knicks')">
+            <div class="card-header">
+                <span>系列賽: 半決賽 (G1)</span>
+                <span>NYK 3 - PHI 7</span>
+            </div>
+            <div class="vs-container">
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/2/25/New_York_Knicks_logo.svg" alt="Knicks">
+                    <div class="team-name">KNICKS</div>
+                </div>
+                <div class="vs-circle">VS</div>
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/0/0e/Philadelphia_76ers_logo.svg" alt="76ers">
+                    <div class="team-name">76ERS</div>
+                </div>
+            </div>
+            <div class="win-prob-bar"><div class="win-prob-fill" style="width: 62%;"></div></div>
+            <p style="font-size: 12px; margin-top: 10px; color: var(--text-dim);">紐約尼克 勝率預測: 62%</p>
+        </div>
+
+        <!-- Pistons vs Cavs -->
+        <div class="card" onclick="openModal('pistons')">
+            <div class="card-header">
+                <span>系列賽: 半決賽 (G1)</span>
+                <span>DET 1 - CLE 4</span>
+            </div>
+            <div class="vs-container">
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Detroit_Pistons_logo.svg/200px-Detroit_Pistons_logo.svg.png" alt="Pistons">
+                    <div class="team-name">PISTONS</div>
+                </div>
+                <div class="vs-circle">VS</div>
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/Cleveland_Cavaliers_logo.svg" alt="Cavs">
+                    <div class="team-name">CAVALIERS</div>
+                </div>
+            </div>
+            <div class="win-prob-bar"><div class="win-prob-fill" style="width: 55%;"></div></div>
+            <p style="font-size: 12px; margin-top: 10px; color: var(--text-dim);">底特律活塞 勝率預測: 55%</p>
+        </div>
+    </div>
+
+    <!-- 西區 -->
+    <div id="west" class="grid">
+        <!-- Thunder vs Lakers -->
+        <div class="card" onclick="openModal('thunder')">
+            <div class="card-header">
+                <span>系列賽: 半決賽 (G1)</span>
+                <span>OKC 1 - LAL 4</span>
+            </div>
+            <div class="vs-container">
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/5c/Oklahoma_City_Thunder_logo.svg" alt="OKC">
+                    <div class="team-name">THUNDER</div>
+                </div>
+                <div class="vs-circle">VS</div>
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Los_Angeles_Lakers_logo.svg/200px-Los_Angeles_Lakers_logo.svg.png" alt="Lakers">
+                    <div class="team-name">LAKERS</div>
+                </div>
+            </div>
+            <div class="win-prob-bar"><div class="win-prob-fill" style="width: 75%;"></div></div>
+            <p style="font-size: 12px; margin-top: 10px; color: var(--text-dim);">雷霆隊 勝率預測: 75%</p>
+        </div>
+
+        <!-- Spurs vs Wolves -->
+        <div class="card" onclick="openModal('spurs')">
+            <div class="card-header">
+                <span>系列賽: 半決賽 (G1)</span>
+                <span>SAS 2 - MIN 6</span>
+            </div>
+            <div class="vs-container">
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/a/a2/San_Antonio_Spurs.svg" alt="Spurs">
+                    <div class="team-name">SPURS</div>
+                </div>
+                <div class="vs-circle">VS</div>
+                <div class="team-info">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/c/c2/Minnesota_Timberwolves_logo.svg" alt="Wolves">
+                    <div class="team-name">WOLVES</div>
+                </div>
+            </div>
+            <div class="win-prob-bar"><div class="win-prob-fill" style="width: 58%;"></div></div>
+            <p style="font-size: 12px; margin-top: 10px; color: var(--text-dim);">聖安東尼奧馬刺 勝率預測: 58%</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()">✕</button>
+        <h2 id="modalTitle" style="font-family: 'Bebas Neue'; font-size: 40px; color: var(--accent-gold);">TEAM DETAILS</h2>
+        <p id="modalDesc" style="margin-bottom: 20px; color: var(--text-dim);"></p>
+        
+        <div class="player-grid" id="playerList">
+            <!-- 動態生成球員卡 -->
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: rgba(255,215,0,0.05); border-radius: 12px;">
+            <h4 style="color: var(--accent-gold);">系列賽戰略分析</h4>
+            <p id="strategyText" style="font-size: 14px; margin-top: 10px;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 數據對象
+    const teamData = {
+        'knicks': {
+            title: "紐約尼克 (New York Knicks)",
+            desc: "2026年東區黑馬，Jalen Brunson 帶領球隊在首輪創造歷史領先紀錄。",
+            strategy: "利用 Towns 的空間拉扯能力壓制費城內線，防守端加強對 Maxey 的體力消耗。",
+            players: [
+                { name: "Jalen Brunson", pos: "PG", id: "1628384" },
+                { name: "K.A. Towns", pos: "C", id: "1627030" },
+                { name: "Tyrese Maxey", pos: "PG", id: "1630178" }
+            ]
+        },
+        'thunder': {
+            title: "奧克拉荷馬雷霆 (OKC Thunder)",
+            desc: "衛冕冠軍，全聯盟第一防守效率，SGA 正在追求他的二連 MVP。",
+            strategy: "Lu Dort 全程纏繞 LeBron，利用快速轉換攻擊湖人老化的退防速度。",
+            players: [
+                { name: "Shai G.A.", pos: "PG", id: "1628983" },
+                { name: "Chet Holmgren", pos: "C", id: "1631096" },
+                { name: "LeBron James", pos: "SF", id: "2544" }
+            ]
+        },
+        'spurs': {
+            title: "聖安東尼奧馬刺 (SA Spurs)",
+            desc: "Wembanyama 季後賽首秀，22歲的法國天才震撼世界。",
+            strategy: "以 Wembanyama 為核心構築禁飛區，進攻端利用全聯盟最快節奏拖垮灰狼雙塔。",
+            players: [
+                { name: "V. Wembanyama", pos: "C", id: "1641705" },
+                { name: "Stephon Castle", pos: "PG", id: "1642263" },
+                { name: "Anthony Edwards", pos: "SG", id: "1630162" }
+            ]
+        },
+        'pistons': {
+            title: "底特律活塞 (Detroit Pistons)",
+            desc: "時隔多年的鐵血底特律回歸，東區第一種子的強勢統治。",
+            strategy: "Cade Cunningham 的組織核心地位不可動搖，需警惕 James Harden 的傳球陷阱。",
+            players: [
+                { name: "Cade Cunningham", pos: "PG", id: "1630595" },
+                { name: "Jaden Ivey", pos: "SG", id: "1631093" },
+                { name: "Donovan Mitchell", pos: "SG", id: "1628378" }
+            ]
+        }
+    };
+
+    // 切換頁籤
+    function showTab(tabId) {
+        document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // 開啟模態視窗
+    function openModal(teamKey) {
+        const data = teamData[teamKey];
+        document.getElementById('modalTitle').innerText = data.title;
+        document.getElementById('modalDesc').innerText = data.desc;
+        document.getElementById('strategyText').innerText = data.strategy;
+        
+        const playerList = document.getElementById('playerList');
+        playerList.innerHTML = '';
+        
+        data.players.forEach(p => {
+            playerList.innerHTML += `
+                <div class="player-card">
+                    <img class="player-img" src="https://cdn.nba.com/headshots/nba/latest/260x190/${p.id}.png" 
+                         onerror="this.src='https://via.placeholder.com/260x190/1e293b/ffd700?text=${p.name}'">
+                    <div style="font-weight:700; font-size:14px;">${p.name}</div>
+                    <div style="color:var(--accent-gold); font-size:11px;">${p.pos}</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('modalOverlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // 點擊背景關閉
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalOverlay');
+        if (event.target == modal) closeModal();
+    }
+</script>
+
+</body>
+</html>
